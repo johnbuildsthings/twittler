@@ -18,20 +18,24 @@
         $body.append(title);
 
         var tweetDiv = $('<div></div>');
-        tweetDiv.attr({style: 'background-color:silver; border-radius:10px'});
+        tweetDiv.attr({style: 'background-color:silver; border-radius:10px; height:400px;'});
         tweetDiv.html('<ul></ul>');
         tweetDiv.appendTo($body);
 
-        var index = streams.home.length - 1;
-        while(index >= 0){  
-          var tweet = streams.home[index];
-          var $tweet = $('<li></li>');
-          $tweet.text('@' + tweet.user + ': ' + tweet.message);
-          $('ul').append($tweet);
-          //$tweetList.append($tweet);
-          
-          index -= 1;
+        var getTweets = function(){
+          var index = streams.home.length - 1;
+          while(index >= 0){  
+            var tweet = streams.home[index];
+            var li = $('<li></li>');
+            li.text('@' + tweet.user + ': ' + tweet.message + ' ' + tweet.created_at);
+            $('ul').append(li);
+            index -= 1;
+          }
         }
+        getTweets();
+        var button = $('<button id="getTweets" type="button">Get Tweets</button>');
+        $body.append(button);
+        $('#getTweets').on('click', getTweets);
         
       });
 

@@ -55,7 +55,8 @@
         //getTweets updates Tweets but only upto 100 tweets
         //displayTweets adds all the tweets in Tweets to the page
         var Tweets = [];
-        
+        var user = null;
+
         var convertTime = function(date){
           var currentTime = new Date();
           var diff = (currentTime.getTime() - date.getTime())/1000;
@@ -86,30 +87,42 @@
         }
 
         var getTweets = function(){
-          var alreadyDisplayed = [];
-          var len = streams.home.length;
-          if(len > 100){
-            Tweets = streams.home.slice(len-100,len);
+          var alreadyDisplayed = [], path;
+          if(user !== null){
+            path = streams.users[user];
           }else{
-            Tweets = streams.home.slice(0,len);
+            path = streams.home;
+          }
+          console.log(user);
+          var len = path.length;
+          if(len > 100){
+            Tweets = path.slice(len-100,len);
+          }else{
+            Tweets = path.slice(0,len);
           }
           displayTweets(Tweets);
         }
         
+        var mainFeed = function(){
+          user = null;
+          getTweets();
+        }
         var displayUser = function(user){
+          Tweets = streams.users[user];
           displayTweets(streams.users[user]);
         }
 
         getTweets();
-        setInterval(refreshTweets, 30000);
-        var button = $('<button id="getTweets" type="button">Get Tweets</button>');
-        $body.append(button);
+        var refreshInterval = setInterval(refreshTweets, 30000);
+        var getTweetB = $('<button id="getTweets" type="button">Get Tweets</button>');
+        var mainFeedB = $('<button id="mainFeed" type="button">Main Feed</button>');
+        $('#tweets').before([getTweetB, mainFeedB]);
         $('#getTweets').on('click', getTweets);
-        $('.name').on('click', function(event, data){
-          //console.log(event.currentTarget.textContent);
-          var name = event.currentTarget.textContent.slice(1,event.currentTarget.textContent.length-1);
-          var user = streams.users[name];
-          displayTweets(user);
+        $('#mainFeed').on('click', mainFeed);
+        $('.name').on('click', function(event){
+          user = event.currentTarget.textContent.slice(1,event.currentTarget.textContent.length-1);
+          //var user = streams.users[name];
+          displayUser(user);
         });
         
       });

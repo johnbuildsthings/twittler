@@ -19,7 +19,19 @@
               border-radius: 10px;\
               height: 75vh;\
               overflow-y: scroll;\
-              margin: 5px;}")
+              margin: 5px;\
+              padding: 5px;\
+            }\
+            button{\
+              background-color:silver;\
+              border-radius:5px;\
+              border: 2px solid grey;\
+              font-weight: bold;\
+              margin: 5px;\
+            }\
+            .tab{\
+              text-indent: 2em;\
+            }")
               .appendTo('head');
         //$body.html('');
         
@@ -28,24 +40,20 @@
         $body.append(title);
 
         var tweetDiv = $('<div id="tweets"></div>');
-        tweetDiv.html('<ul></ul>');
         tweetDiv.appendTo($body);
         $('#tweets').addClass('tweetStyle');
 
         var getTweets = function(){
-          //var elements = [];
           var index = streams.home.length - 1;
           while(index >= 0){  
             var tweet = streams.home.shift();
-            var li = $('<li></li>');
-            li.text('@' + tweet.user + ': ' + tweet.message + ' ' + tweet.created_at);
-            //elements.push(li);
+            var message = ('<p class="tab">'+'@' + tweet.user + ':'+'<br>' + tweet.message + '<br>'+ tweet.created_at + '</p>');
+            $('#tweets').prepend(message);
             index -= 1;
-            $('ul').prepend(li);
           }
           console.log('tweets ', $('ul li').length);
-          
         }
+
         /*
         var refreshTweets = function(){
           var newTweets = getTweets();

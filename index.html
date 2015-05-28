@@ -11,27 +11,46 @@
 
       $(document).ready(function(){
         var $body = $('body');
+        $("<style>")
+          .prop('type', 'text/css')
+          .html("\
+            .tweetStyle {\
+              background-color: silver;\
+              border-radius: 10px;\
+              height: 75vh;\
+              overflow-y: scroll;\
+              margin: 5px;}")
+              .appendTo('head');
         //$body.html('');
         
         //title
         var title = $('<h1>Twittler</h1>');
         $body.append(title);
 
-        var tweetDiv = $('<div></div>');
-        tweetDiv.attr({style: 'background-color:silver; border-radius:10px; height:400px;'});
+        var tweetDiv = $('<div id="tweets"></div>');
         tweetDiv.html('<ul></ul>');
         tweetDiv.appendTo($body);
+        $('#tweets').addClass('tweetStyle');
 
         var getTweets = function(){
+          //var elements = [];
           var index = streams.home.length - 1;
           while(index >= 0){  
-            var tweet = streams.home[index];
+            var tweet = streams.home.shift();
             var li = $('<li></li>');
             li.text('@' + tweet.user + ': ' + tweet.message + ' ' + tweet.created_at);
-            $('ul').append(li);
+            //elements.push(li);
             index -= 1;
+            $('ul').prepend(li);
           }
+          console.log('tweets ', $('ul li').length);
+          
         }
+        /*
+        var refreshTweets = function(){
+          var newTweets = getTweets();
+          if()
+        }*/
         getTweets();
         var button = $('<button id="getTweets" type="button">Get Tweets</button>');
         $body.append(button);

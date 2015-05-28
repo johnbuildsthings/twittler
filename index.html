@@ -29,8 +29,16 @@
               font-weight: bold;\
               margin: 5px;\
             }\
-            .tab{\
-              text-indent: 2em;\
+            p{\
+              margin:0px;\
+              padding:0px;\
+              border:0px;\
+            }\
+            p.tab{\
+              text-indent:2em;\
+            }\
+            p.name{\
+              font-weight: bold;\
             }")
               .appendTo('head');
         //$body.html('');
@@ -43,26 +51,66 @@
         tweetDiv.appendTo($body);
         $('#tweets').addClass('tweetStyle');
 
-        var getTweets = function(){
-          var index = streams.home.length - 1;
-          while(index >= 0){  
-            var tweet = streams.home.shift();
-            var message = ('<p class="tab">'+'@' + tweet.user + ':'+'<br>' + tweet.message + '<br>'+ tweet.created_at + '</p>');
-            $('#tweets').prepend(message);
+        //Tweets holds all the currently displayed tweets
+        //getTweets updates Tweets but only upto 100 tweets
+        //displayTweets adds all the tweets in Tweets to the page
+        var Tweets = [];
+        
+        var convertTime = function(date){
+          var currentTime = new Date();
+          var diff = (currentTime.getTime() - date.getTime())/1000;
+          //console.log('curr: ', currentTime, '\n', 'date: ', date.toTimeString(), '\n', 'diff: ', diff);
+          if(diff < 60){
+            return (Math.floor(diff+1)+' seconds ago');
+          }else if(diff < 3600){
+            return (Math.floor(diff/60)+' minutes ago');
+          }else{
+            return date.toTimeString();
+          }
+        }
+        var displayTweets = function(list){
+          var index = list.length-1;
+          var messages = []
+          while(index >= 0){
+            var tweet = list[index];
+            var time = convertTime(tweet.created_at);
+            var message = ('<p class="name">'+'@' + tweet.user + ':'+'</p><p class="tab">' + tweet.message +' --('+ time +')'+ '</p>');
+            messages.push(message);
             index -= 1;
           }
-          console.log('tweets ', $('ul li').length);
+          $('#tweets').html(messages);
+        }
+        
+        var refreshTweets = function(){
+          displayTweets(Tweets);
         }
 
-        /*
-        var refreshTweets = function(){
-          var newTweets = getTweets();
-          if()
-        }*/
+        var getTweets = function(){
+          var alreadyDisplayed = [];
+          var len = streams.home.length;
+          if(len > 100){
+            Tweets = streams.home.slice(len-100,len);
+          }else{
+            Tweets = streams.home.slice(0,len);
+          }
+          displayTweets(Tweets);
+        }
+        
+        var displayUser = function(user){
+          displayTweets(streams.users[user]);
+        }
+
         getTweets();
+        setInterval(refreshTweets, 30000);
         var button = $('<button id="getTweets" type="button">Get Tweets</button>');
         $body.append(button);
         $('#getTweets').on('click', getTweets);
+        $('.name').on('click', function(event, data){
+          //console.log(event.currentTarget.textContent);
+          var name = event.currentTarget.textContent.slice(1,event.currentTarget.textContent.length-1);
+          var user = streams.users[name];
+          displayTweets(user);
+        });
         
       });
 

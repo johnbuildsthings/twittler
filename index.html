@@ -18,7 +18,7 @@
               background-color: silver;\
               border-radius: 10px;\
               height: 75vh;\
-              overflow-y: scroll;\
+              overflow-y: auto;\
               margin: 5px;\
               padding: 5px;\
             }\
@@ -39,6 +39,19 @@
             }\
             p.name{\
               font-weight: bold;\
+            }\
+            h1{\
+              font-style: oblique;\
+              text-decoration: underline;\
+              text-align: center;\
+            }\
+            #tweetMain{\
+              width: 47%;\
+              float: left;\
+            }\
+            #tweetSecondary{\
+              width: 47%;\
+              float: right;\
             }")
               .appendTo('head');
         //$body.html('');
@@ -48,13 +61,18 @@
         $body.append(title);
 
         var tweetDiv = $('<div id="tweets"></div>');
+        var tweetMain = $('<div id="tweetMain" class="tweetStyle"></div>');
+        var tweetSecondary = $('<div id="tweetSecondary" class="tweetStyle"></div>');
         tweetDiv.appendTo($body);
-        $('#tweets').addClass('tweetStyle');
+        tweetDiv.append([tweetMain, tweetSecondary]);
 
+
+       
         //Tweets holds all the currently displayed tweets
         //getTweets updates Tweets but only upto 100 tweets
         //displayTweets adds all the tweets in Tweets to the page
         var Tweets = [];
+        var userTweets = [];
         var user = null;
 
         var convertTime = function(date){
@@ -69,7 +87,7 @@
             return date.toTimeString();
           }
         }
-        var displayTweets = function(list){
+        var displayTweets = function(list, id){
           var index = list.length-1;
           var messages = []
           while(index >= 0){
@@ -79,49 +97,53 @@
             messages.push(message);
             index -= 1;
           }
-          $('#tweets').html(messages);
+          $(id).html(messages);
         }
         
         var refreshTweets = function(){
-          displayTweets(Tweets);
+          displayTweets(Tweets, '#tweetMain');
+          displayTweets(userTweets, '#tweetSecondary');
+          $('.name').on('click', nameClick);
         }
 
         var getTweets = function(){
-          var alreadyDisplayed = [], path;
-          if(user !== null){
-            path = streams.users[user];
-          }else{
-            path = streams.home;
-          }
-          var len = path.length;
+          var args = Array.prototype.slice.call(arguments);
+          Tweets = streams.home.slice(0, streams.home.length), len = Tweets.length;
+          console.log();
           if(len > 100){
-            Tweets = path.slice(len-100,len);
+            Tweets = Tweets.slice(len-100,len);
           }else{
-            Tweets = path.slice(0,len);
+            Tweets = Tweets.slice(0,len);
           }
-          displayTweets(Tweets);
-        }
-        
-        var mainFeed = function(){
-          user = null;
-          getTweets();
+          if(args.length <= 1){
+            args = [Tweets, '#tweetMain'];
+          }
+          displayTweets(args[0], args[1]);
           $('.name').on('click', nameClick);
+        }
+
+        var moreTweets = function(){
+          userTweets = streams.users[user].slice(0,streams.users[user].length);
+          getTweets(userTweets, '#tweetSecondary'); 
+          refreshTweets();
         }
 
         var nameClick = function(event){
           user = event.currentTarget.textContent.slice(1,event.currentTarget.textContent.length-1);
-          Tweets = streams.users[user].slice(0,streams.users[user].length);
-          displayTweets(Tweets);
-        }
-        
+          userTweets = streams.users[user].slice(0,streams.users[user].length);
+          getTweets(userTweets, '#tweetSecondary');
+          refreshTweets();
+        }     
 
         getTweets();
         var refreshInterval = setInterval(refreshTweets, 30000);
         var getTweetB = $('<button id="getTweets" type="button">Get Tweets</button>');
-        var mainFeedB = $('<button id="mainFeed" type="button">Main Feed</button>');
-        $('#tweets').before([getTweetB, mainFeedB]);
+        var moreTweetsB = $('<button id="moreTweets" type="button">More</button>');
+        
+        $('#tweets').before([getTweetB, moreTweetsB]);
+        
         $('#getTweets').on('click', getTweets);
-        $('#mainFeed').on('click', mainFeed);
+        $('#moreTweets').on('click', moreTweets);
         $('.name').on('click', nameClick);
         
       });

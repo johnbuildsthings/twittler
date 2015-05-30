@@ -52,6 +52,17 @@
             #tweetSecondary{\
               width: 47%;\
               float: right;\
+            }\
+            .b{\
+              margin: 5px;\
+              padding: 5px;\
+              width: 47%;\
+              height: 25px;\
+              border-radius:10px;\
+              background-color: green;\
+              text-align: center;\
+              font-size: larger;\
+              box-shadow: 5px 5px 5px;\
             }")
               .appendTo('head');
         //$body.html('');
@@ -63,10 +74,22 @@
         var tweetDiv = $('<div id="tweets"></div>');
         var tweetMain = $('<div id="tweetMain" class="tweetStyle"></div>');
         var tweetSecondary = $('<div id="tweetSecondary" class="tweetStyle"></div>');
-        tweetDiv.appendTo($body);
-        tweetDiv.append([tweetMain, tweetSecondary]);
-
-
+        tweetDiv.append([tweetMain, tweetSecondary]).appendTo($body);
+        
+        //var getTweetB = $('<button id="getTweets" type="button">Get Tweets</button>');
+        //var moreTweetsB = $('<button id="moreTweets" type="button">More</button>');
+        
+        var createButton = function(value, id){
+          var button = $('<div class="b"></div>');
+          button.attr('id', id);
+          button.text(value);
+          return button;
+        }
+        var getMain = new createButton('Update Main Feed', 'main');
+        var getUser = new createButton('Update Users Tweets', 'user');
+        getMain.css('float','left');
+        getUser.css('float','right');
+        tweetDiv.before([getMain, getUser]);
        
         //Tweets holds all the currently displayed tweets
         //getTweets updates Tweets but only upto 100 tweets
@@ -87,6 +110,7 @@
             return date.toTimeString();
           }
         }
+
         var displayTweets = function(list, id){
           var index = list.length-1;
           var messages = []
@@ -137,15 +161,10 @@
 
         getTweets();
         var refreshInterval = setInterval(refreshTweets, 30000);
-        var getTweetB = $('<button id="getTweets" type="button">Get Tweets</button>');
-        var moreTweetsB = $('<button id="moreTweets" type="button">More</button>');
-        
-        $('#tweets').before([getTweetB, moreTweetsB]);
-        
-        $('#getTweets').on('click', getTweets);
-        $('#moreTweets').on('click', moreTweets);
+        $('#main').on('click', getTweets);
+        $('#user').on('click', moreTweets);
         $('.name').on('click', nameClick);
-        
+
       });
 
     </script>

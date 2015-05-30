@@ -60,7 +60,7 @@
               width: 47%;\
               height: 25px;\
               border-radius:10px;\
-              background-color: green;\
+              background-color: grey;\
               text-align: center;\
               font-size: larger;\
               box-shadow: 5px 5px 5px;\
@@ -77,9 +77,6 @@
         var tweetSecondary = $('<div id="tweetSecondary" class="tweetStyle"></div>');
         tweetDiv.append([tweetMain, tweetSecondary]).appendTo($body);
         
-        //var getTweetB = $('<button id="getTweets" type="button">Get Tweets</button>');
-        //var moreTweetsB = $('<button id="moreTweets" type="button">More</button>');
-        
         var createButton = function(value, id){
           var button = $('<div class="b"></div>');
           button.attr('id', id);
@@ -88,6 +85,7 @@
         }
         var getMain = new createButton('Update Main Feed', 'main');
         var getUser = new createButton('Update Users Tweets', 'user');
+
         getMain.css('float','left');
         getUser.css('float','right');
         tweetDiv.before([getMain, getUser]);
@@ -129,9 +127,9 @@
         
         var refreshTweets = function(){
           getTweets();
-          //if(userTweets.length > 0){
-            //moreTweets();
-          //}
+          if(userTweets.length > 0){
+            moreTweets();
+          }
         }
 
         var getTweets = function(){
@@ -159,7 +157,8 @@
           user = event.currentTarget.textContent.slice(1,event.currentTarget.textContent.length-1);
           userTweets = streams.users[user].slice(0,streams.users[user].length);
           getTweets(userTweets, '#tweetSecondary');
-          //refreshTweets();
+          getUser.text('Update '+user+' Tweets');
+          refreshTweets();
         }     
 
         getTweets();

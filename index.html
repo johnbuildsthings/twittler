@@ -21,6 +21,7 @@
               overflow-y: auto;\
               margin: 5px;\
               padding: 5px;\
+              box-shadow: 5px 5px 5px;\
             }\
             button{\
               background-color:silver;\
@@ -107,7 +108,8 @@
           }else if(diff < 3600){
             return (Math.floor(diff/60)+' minutes ago');
           }else{
-            return date.toTimeString();
+            var time = date.toTimeString().split(' ')[0];
+            return time;
           }
         }
 
@@ -122,41 +124,42 @@
             index -= 1;
           }
           $(id).html(messages);
+          $('.name').on('click', nameClick);
         }
         
         var refreshTweets = function(){
-          displayTweets(Tweets, '#tweetMain');
-          displayTweets(userTweets, '#tweetSecondary');
-          $('.name').on('click', nameClick);
+          getTweets();
+          //if(userTweets.length > 0){
+            //moreTweets();
+          //}
         }
 
         var getTweets = function(){
           var args = Array.prototype.slice.call(arguments);
-          Tweets = streams.home.slice(0, streams.home.length), len = Tweets.length;
-          console.log();
-          if(len > 100){
-            Tweets = Tweets.slice(len-100,len);
-          }else{
-            Tweets = Tweets.slice(0,len);
-          }
           if(args.length <= 1){
+            Tweets = streams.home.slice(0, streams.home.length);
             args = [Tweets, '#tweetMain'];
           }
+          //console.log(Tweets);
+          if(args[0].length > 100){
+            args[0] = args[0].slice(args[0].length-100,args[0].length);
+          }else{
+            args[0] = args[0].slice(0,args[0].length);
+          }
           displayTweets(args[0], args[1]);
-          $('.name').on('click', nameClick);
         }
 
         var moreTweets = function(){
           userTweets = streams.users[user].slice(0,streams.users[user].length);
           getTweets(userTweets, '#tweetSecondary'); 
-          refreshTweets();
+          //refreshTweets();
         }
 
         var nameClick = function(event){
           user = event.currentTarget.textContent.slice(1,event.currentTarget.textContent.length-1);
           userTweets = streams.users[user].slice(0,streams.users[user].length);
           getTweets(userTweets, '#tweetSecondary');
-          refreshTweets();
+          //refreshTweets();
         }     
 
         getTweets();
